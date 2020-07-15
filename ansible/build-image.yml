@@ -11,11 +11,10 @@
       DOCKER_USER="{{ lookup('env','DOCKER_USER') }}"
   - name: Build New Docker Image
     docker_image:
-      build:
-        path: /etc/ansible/tomcat
+      path: /etc/ansible/tomcat
       name: "{{ DOCKER_USER }}/tomcat"
       tag: "pipeline-{{ BUILD_ID }}"
-      source: build
+      state: build
     register: docker_build
   - debug:
       msg: "Docker Image Build Done: {{ DOCKER_USER }}/tomcat:pipeline-{{ BUILD_ID }}"
