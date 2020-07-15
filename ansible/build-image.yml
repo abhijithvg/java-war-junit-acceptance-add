@@ -9,6 +9,8 @@
   - set_fact:
       BUILD_ID="{{ lookup('env','BUILD_ID') }}"
       DOCKER_USER="{{ lookup('env','DOCKER_USER') }}"
+  - name: Current path
+    shell: pwd && ls -l
   - name: Build New Docker Image
     docker_image:
       path: ../tomcat
