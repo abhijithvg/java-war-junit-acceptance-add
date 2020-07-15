@@ -12,7 +12,7 @@
       BASE_PATH="{{ lookup('env','BASE_PATH') }}"
   - name: Build New Docker Image
     docker_image:
-      path: "{{ BASE_PATH }}"
+      path: ../tomcat
       name: "{{ DOCKER_USER }}/tomcat"
       tag: "pipeline-{{ BUILD_ID }}"
       state: build
