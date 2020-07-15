@@ -7,13 +7,13 @@
 
   tasks:
   - set_fact:
-      BUILD_ID="{{ lookup('env','BUILD_ID') }}"
+      BUILD_ID:"{{ lookup('env','BUILD_ID') }}"
       DOCKER_USER="{{ lookup('env','DOCKER_USER') }}"
   - name: Build New Docker Image
     docker_image:
       path: ../tomcat
-      name: {{DOCKER_USER}}/tomcat
-      tag: pipeline-{{BUILD_ID}}
+      name: "{{DOCKER_USER}}"/tomcat
+      tag: pipeline-"{{BUILD_ID}}"
     register: docker_build
   - debug:
       msg: "Docker Image Build Done: {{DOCKER_USER}}/tomcat:pipeline-{{BUILD_ID}}"

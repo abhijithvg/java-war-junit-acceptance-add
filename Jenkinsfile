@@ -42,15 +42,22 @@ pipeline {
       }
 
       stage('Build Image') {
-          agent {
-              docker {
-                  image "abhijithvg/ansible-with-docker-ws"
-                  args "-v /var/run/docker.sock:/var/run/docker.sock -w /etc/ansible -e 'BUILD_ID=${env.BUILD_ID}' -e 'DOCKER_USER=${params.DOCKER_U}'"
-              }
-          }
           steps {
-              sh('ansible-playbook ansible/build-image.yml')
+              sh('pwd')
+              sh('ls -la')
+              sh "docker run --rm -i -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}/ansible:/etc/ansible -w /etc/ansible -e 'BUILD_ID=${env.BUILD_ID}' -e 'DOCKER_USER=${params.DOCKER_U}' abhijithvg/ansible-with-docker-ws ansible-playbook -i localhost build-image.yml"
           }
+        //   agent {
+        //       docker {
+        //           image "abhijithvg/ansible-with-docker-ws"
+        //           args "-u root --privileged -v $PWD/ansible:/etc/ansible -w /etc/ansible -e 'BUILD_ID=${env.BUILD_ID}' -e 'DOCKER_USER=${params.DOCKER_U}'"
+        //       }
+        //   }
+        //   stages {
+        //     stage('Inside Ansible Docker Container') {
+        //        sh('ansible-playbook ansible/build-image.yml')
+        //     }
+        //   }
       }
 
       stage('Push Docker Image') {
