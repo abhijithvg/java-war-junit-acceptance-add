@@ -41,23 +41,10 @@ pipeline {
         }
       }
 
-      stage('Build Image') {
-          steps {
-              sh('pwd')
-              sh('ls -la')
-              sh "docker run --rm -i -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}:/etc/ansible -w /etc/ansible/ansible -e 'BUILD_ID=${env.BUILD_ID}' -e 'DOCKER_USER=${params.DOCKER_U}' -e 'BASE_PATH=${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}' abhijithvg/ansible-with-docker-ws ansible-playbook -i hosts build-image.yml"
-          }
-        //   agent {
-        //       docker {
-        //           image "abhijithvg/ansible-with-docker-ws"
-        //           args "-u root --privileged -v $PWD/ansible:/etc/ansible -w /etc/ansible -e 'BUILD_ID=${env.BUILD_ID}' -e 'DOCKER_USER=${params.DOCKER_U}'"
-        //       }
-        //   }
-        //   stages {
-        //     stage('Inside Ansible Docker Container') {
-        //        sh('ansible-playbook ansible/build-image.yml')
-        //     }
-        //   }
+      stage('Build Docker Image') {
+        steps {
+          sh "docker build -t ${params.DOCKER_U}/tomcat:pipeline-${BUILD_ID} tomcat"
+        }
       }
 
       stage('Push Docker Image') {
