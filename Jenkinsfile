@@ -52,10 +52,9 @@ pipeline {
               withCredentials([usernamePassword(credentialsId: 'docker-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                   sh("docker login -u=${DOCKER_USERNAME} -p=${DOCKER_PASSWORD}")
                   sh("docker push ${DOCKER_USERNAME}/tomcat:pipeline-${env.BUILD_ID}")
+                  //To remove the image locally
+                  //sh('docker rmi ${params.DOCKER_U}/tomcat:pipeline-${env.BUILD_ID}')
               }
-
-              //To remove the image locally
-              //sh('docker rmi ${params.DOCKER_U}/tomcat:pipeline-${env.BUILD_ID}')
           }
       }
       stage('Deploy to Docker Tomcat') {
