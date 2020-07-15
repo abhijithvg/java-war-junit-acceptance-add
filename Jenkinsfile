@@ -45,7 +45,7 @@ pipeline {
           steps {
               sh('pwd')
               sh('ls -la')
-              sh "docker run --rm -i -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}/ansible:/etc/ansible -w /etc/ansible -e 'BUILD_ID=${env.BUILD_ID}' -e 'DOCKER_USER=${params.DOCKER_U}' abhijithvg/ansible-with-docker-ws ansible-playbook -i localhost build-image.yml"
+              sh "docker run --rm -i -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}:/etc/ansible -w /etc/ansible/ansible -e 'BUILD_ID=${env.BUILD_ID}' -e 'DOCKER_USER=${params.DOCKER_U}' abhijithvg/ansible-with-docker-ws ansible-playbook -i hosts build-image.yml"
           }
         //   agent {
         //       docker {
