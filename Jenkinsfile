@@ -32,6 +32,7 @@ pipeline {
          sh "docker run --net=jenkins --rm -i -v ${params.MVNCACHE}:/root/.m2 -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}:/project -w /project maven:3.6.3-jdk-8-openj9 mvn clean test"
         }
       }
+
       stage('Build Java App') {
         steps {
           sh "docker run --net=jenkins --rm -i -v ${params.MVNCACHE}:/root/.m2 -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}:/project -w /project maven:3.6.3-jdk-8-openj9 mvn package"
@@ -69,6 +70,9 @@ pipeline {
       }
 
       stage('Selenium Acceptance Test') {
+        environment {
+          CLASSPATH = ".:/var/jar_repo/htmlunit-driver-2.42.0-jar-with-dependencies.jar:/var/jar_repo/selenium-server-standalone-3.141.59.jar:/var/jar_repo/testng-6.0.1.jar"
+        }
         stages {
           stage('Configuring Values for Testing') {
             steps {
@@ -79,10 +83,8 @@ pipeline {
           }
           stage('Executing Acceptance Testing') {
             steps {
-              sh 'cd seleniumtest'
-              sh 'export CLASSPATH=".:/var/jar_repo/htmlunit-driver-2.42.0-jar-with-dependencies.jar:/var/jar_repo/selenium-server-standalone-3.141.59.jar:/var/jar_repo/testng-6.0.1.jar"'
-              sh 'javac HtmlAddTest.java'
-              sh 'java HtmlAddTest'
+              sh 'cd seleniumtest && javac HtmlAddTest.java'
+              sh 'cd seleniumtest && java HtmlAddTest'
             }
           }
         }
