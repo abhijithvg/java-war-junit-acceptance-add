@@ -19,7 +19,7 @@ pipeline {
 
       stage('Clone') {
         steps {
-          git url: 'https://github.com/abhijithvg/java-war-junit-acceptance-selenium.git'
+          git url: 'https://github.com/abhijithvg/jenkins-java-war-junit-acceptance-selenium.git'
           sh '''sed -i \"s/BUILD_ID/${BUILD_ID}/\" src/main/webapp/index.jsp'''
           sh '''sed -i \"s/BUILD_ID/${BUILD_ID}/\" kubernetes/deploy-svc.yml'''
           sh '''sed -i \"s/BUILD_ID/${BUILD_ID}/\" ansible/docker-image-creation.yml'''
