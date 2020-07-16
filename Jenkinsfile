@@ -11,7 +11,8 @@ pipeline {
     string(name: 'DOCKER_U', defaultValue: 'abhijithvg', description: 'Docker Hub Username')
     string(name: 'INPUT1', defaultValue: '10', description: 'Acceptance Test Input 1')
     string(name: 'INPUT2', defaultValue: '5', description: 'Acceptance Test Input 2')
-    string(name: 'ADDRESULT', defaultValue: '15', description: 'Acceptance Test Input Add Result')
+    string(name: 'ADDRESULT', defaultValue: '15', description: 'Acceptance Test Input: Add Result')
+    string(name: 'SUBRESULT', defaultValue: '5', description: 'Acceptance Test Input: Sub Result')
   }
 
   stages {
@@ -74,17 +75,30 @@ pipeline {
           CLASSPATH = ".:/var/jar_repo/htmlunit-driver-2.42.0-jar-with-dependencies.jar:/var/jar_repo/selenium-server-standalone-3.141.59.jar:/var/jar_repo/testng-6.0.1.jar"
         }
         stages {
-          stage('Configuring Values for Testing') {
+          stage('Configuring Values for Testing: ADD') {
             steps {
               sh '''sed -i \"s/INPUT1/${INPUT1}/\" seleniumtest/HtmlAddTest.java'''
               sh '''sed -i \"s/INPUT2/${INPUT2}/\" seleniumtest/HtmlAddTest.java'''
               sh '''sed -i \"s/RESULT/${ADDRESULT}/\" seleniumtest/HtmlAddTest.java'''
             }
           }
-          stage('Executing Acceptance Testing') {
+          stage('Executing Acceptance Testing: ADD') {
             steps {
               sh 'cd seleniumtest && javac HtmlAddTest.java'
               sh 'cd seleniumtest && java HtmlAddTest'
+            }
+          }
+          stage('Configuring Values for Testing: SUB') {
+            steps {
+              sh '''sed -i \"s/INPUT1/${INPUT1}/\" seleniumtest/HtmlSubTest.java'''
+              sh '''sed -i \"s/INPUT2/${INPUT2}/\" seleniumtest/HtmlSubTest.java'''
+              sh '''sed -i \"s/RESULT/${SUBRESULT}/\" seleniumtest/HtmlSubTest.java'''
+            }
+          }
+          stage('Executing Acceptance Testing: SUB') {
+            steps {
+              sh 'cd seleniumtest && javac HtmlSubTest.java'
+              sh 'cd seleniumtest && java HtmlSubTest'
             }
           }
         }
