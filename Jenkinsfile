@@ -9,6 +9,9 @@ pipeline {
     string(name: 'JENKINSDIR', defaultValue: '/Users/abhijithvg/Desktop/WorkFolder/Schogini-Training/Demos/CICD-Pipeline/forjenkins/jenkins_home', description: 'The project path in the host machine')
     string(name: 'MVNCACHE', defaultValue: '/Users/abhijithvg/Training/Collabera/DevOpsPlus1/.m2', description: 'Maven repository cache in the host machine')
     string(name: 'DOCKER_U', defaultValue: 'abhijithvg', description: 'Docker Hub Username')
+    string(name: 'INPUT1', defaultValue: '10', description: 'Acceptance Test Input 1')
+    string(name: 'INPUT2', defaultValue: '5', description: 'Acceptance Test Input 2')
+    string(name: 'ADDRESULT', defaultValue: '15', description: 'Acceptance Test Input Add Result')
   }
 
   stages {
@@ -62,6 +65,25 @@ pipeline {
         steps {
           sh "docker inspect my-tcc2 >/dev/null 2>&1 && docker rm -f my-tcc2 || echo No container to remove. Proceed."
           sh "docker run --net=jenkins -id -p 7081:8080 --name my-tcc2 docker.io/${params.DOCKER_U}/tomcat:pipeline-${BUILD_ID}"
+        }
+      }
+
+      stage('Selenium Acceptance Test') {
+        stages {
+          stage('Configuring Values for Testing') {
+            steps {
+              sh '''sed -i \"s/INPUT1/${INPUT1}/\" seleniumtest/HtmlAddTest.java'''
+              sh '''sed -i \"s/INPUT2/${INPUT2}/\" seleniumtest/HtmlAddTest.java'''
+              sh '''sed -i \"s/RESULT/${ADDRESULT}/\" seleniumtest/HtmlAddTest.java'''
+            }
+          }
+          stage('Executing Acceptance Testing') {
+            steps {
+              sh 'export CLASSPATH=".:/var/jar_repo/htmlunit-driver-2.42.0-jar-with-dependencies.jar:/var/jar_repo/selenium-server-standalone-3.141.59.jar:/var/jar_repo/testng-6.0.1.jar"'
+              sh 'javac HtmlAddTest.java'
+              sh 'java HtmlAddTest'
+            }
+          }
         }
       }
 
