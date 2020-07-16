@@ -26,12 +26,12 @@ pipeline {
 
       stage('Unit Tests') {
         steps {
-         sh "docker run --rm -i -v ${params.MVNCACHE}:/root/.m2 -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}:/project -w /project maven:3.6.3-jdk-8-openj9 mvn clean test"
+         sh "docker run --net=jenkins --rm -i -v ${params.MVNCACHE}:/root/.m2 -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}:/project -w /project maven:3.6.3-jdk-8-openj9 mvn clean test"
         }
       }
       stage('Build Java App') {
         steps {
-          sh "docker run --rm -i -v ${params.MVNCACHE}:/root/.m2 -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}:/project -w /project maven:3.6.3-jdk-8-openj9 mvn package"
+          sh "docker run --net=jenkins --rm -i -v ${params.MVNCACHE}:/root/.m2 -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}:/project -w /project maven:3.6.3-jdk-8-openj9 mvn package"
        }
       }
 
@@ -57,10 +57,11 @@ pipeline {
               }
           }
       }
+
       stage('Deploy to Docker Tomcat') {
         steps {
           sh "docker inspect my-tcc2 >/dev/null 2>&1 && docker rm -f my-tcc2 || echo No container to remove. Proceed."
-          sh "docker run -id -p 7081:8080 --name my-tcc2 docker.io/${params.DOCKER_U}/tomcat:pipeline-${BUILD_ID}"
+          sh "docker run --net=jenkins -id -p 7081:8080 --name my-tcc2 docker.io/${params.DOCKER_U}/tomcat:pipeline-${BUILD_ID}"
         }
       }
 
