@@ -1,8 +1,12 @@
 <%@ page import="com.abhi.Calculator" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+ pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>Enter two numbers to subtract</title>
-    </head>
+  <head>
+    <meta charset="ISO-8859-1">
+    <title>Subtraction Page</title>
+  </head>
 
     <body>
       <% Calculator calculator = new Calculator(); %>
