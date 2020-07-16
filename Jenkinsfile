@@ -79,6 +79,7 @@ pipeline {
           }
           stage('Executing Acceptance Testing') {
             steps {
+              sh 'cd seleniumtest'
               sh 'export CLASSPATH=".:/var/jar_repo/htmlunit-driver-2.42.0-jar-with-dependencies.jar:/var/jar_repo/selenium-server-standalone-3.141.59.jar:/var/jar_repo/testng-6.0.1.jar"'
               sh 'javac HtmlAddTest.java'
               sh 'java HtmlAddTest'

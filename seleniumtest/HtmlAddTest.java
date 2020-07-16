@@ -10,9 +10,9 @@ public class HtmlAddTest {
         driver.get("http://my-tcc2:8080/webapp/add.html");
 
         // Replace INPUT1, INPUT2 & RESULT - during runtime
-        int t1 = INPUT1;
-        int t2 = INPUT2;
-        int res = RESULT;
+        String t1 = "INPUT1";
+        String t2 = "INPUT2";
+        String res = "RESULT";
 
         WebElement element1 = driver.findElement(By.name("t1"));
         WebElement element2 = driver.findElement(By.name("t2"));
