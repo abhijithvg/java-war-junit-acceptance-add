@@ -34,17 +34,6 @@ pipeline {
         }
       }
 
-      stage('SonarQube Analysis') {
-        steps {
-          withSonarQubeEnv('sonar-6') {
-              withMaven(maven: 'maven-3') {
-                  sh 'mvn sonar:sonar'
-              }
-              // sh "docker run --net=jenkins --rm -i -v ${params.MVNCACHE}:/root/.m2 -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}:/project -w /project maven:3.6.3-jdk-8-openj9 mvn sonar:sonar"
-          }
-        }
-      }
-
       stage('Build Java App') {
         steps {
           sh "docker run --net=jenkins --rm -i -v ${params.MVNCACHE}:/root/.m2 -v ${params.JENKINSDIR}/workspace/${JOB_BASE_NAME}:/project -w /project maven:3.6.3-jdk-8-openj9 mvn package"
@@ -113,17 +102,6 @@ pipeline {
             }
           }
         }
-      }
-
-      stage('Slack Notification'){
-         steps {
-           slackSend baseUrl: 'https://hooks.slack.com/services/',
-           channel: '#jenkins-demo',
-           color: 'good',
-           message: 'Finished the Jenkins Pipeline, DONE!',
-           teamDomain: 'schogini',
-           tokenCredentialId: 'slack-id'
-         }
       }
 
     //   stage('Deploy to Kubernetes') {
