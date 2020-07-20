@@ -1,0 +1,126 @@
+=========
+Install Required Plugins:
+> Manage Jenkins > Manage Plugins > Install
+  - Slack Notification Plugin
+  - Sonarqube Scanner for Jenkins
+  - Pipeline Maven Integration Plugin
+
+=========
+Configure Maven as Global Tool:
+> Manage Jenkins > Global Tool Configuration > Maven > Add Maven
+  - Name: maven-3
+    Install: version 3.6.3
+
+=========
+Creating SonarQube EC2 instance:
+  - AMI: Ubuntu 18.04 LTS
+  - Instance Type: t2.medium
+  - Storage: 10GB
+  - Tag: Name - SonarQube-Server
+  - Security Group - abhi-sonarqube
+    - HTTP - 80
+    - HTTPS - 443
+    - SSH - 22
+    - Custom TCP Rule - 9000
+  - Keypair: AbhiDemoKey.pem
+
+=========
+Installing and SettingUp SonarQube on EC2 instance:
+  $ ssh -i AbhiDemoKey.pem ubuntu@13.233.244.176
+  $ sudo apt-get update
+  $ sudo apt-get install -y unzip
+  $ sudo apt-get install -y software-properties-common
+  $ sudo apt-get install -y wget
+  $ sudo apt-get install -y default-jdk
+
+  $ sudo apt-get install -y postgresql
+  $ sudo apt-get install -y postgresql-contrib
+
+  $ sudo su - postgres
+  $ psql
+
+  # CREATE USER sonarqube WITH PASSWORD 'abhi123';
+  # CREATE DATABASE sonarqube OWNER sonarqube;
+  # GRANT ALL PRIVILEGES ON DATABASE sonarqube TO sonarqube;
+  # \q
+
+  $ exit
+  $ sudo mkdir /downloads/sonarqube -p
+  $ cd /downloads/sonarqube
+  $ sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.9.1.zip
+  $ sudo unzip sonarqube-7.9.1.zip
+  $ sudo mv sonarqube-7.9.1 /opt/sonarqube
+
+
+  $ sudo adduser --system --no-create-home --group --disabled-login sonarqube
+  $ sudo chown -R sonarqube:sonarqube /opt/sonarqube
+
+
+  $ sudo nano /opt/sonarqube/bin/linux-x86-64/sonar.sh
+  	RUN_AS_USER=sonarqube
+
+  	sonar.jdbc.username=sonarqube
+  	sonar.jdbc.password=abhi123
+  	sonar.jdbc.url=jdbc:postgresql://localhost/sonarqube
+  	sonar.web.javaAdditionalOpts=-server
+  	sonar.web.host=0.0.0.0
+
+  $ sudo nano /etc/security/limits.d/99-sonarqube.conf
+  	sonarqube   -   nofile   65536
+  	sonarqube   -   nproc    4096
+
+  $ sudo nano /etc/sysctl.conf
+  	vm.max_map_count=262144
+  	fs.file-max=65536
+
+  $ sudo reboot
+
+========
+Starting SonarQube Server on EC2 instance:
+  $ ssh -i AbhiDemoKey.pem ubuntu@13.233.244.176
+  $ sudo /opt/sonarqube/bin/linux-x86-64/sonar.sh start
+
+  $ sudo  tail -f /opt/sonarqube/logs/sonar.log
+
+========
+Browsing SonarQube Server on EC2 instance:
+  Browse: http://13.233.244.176:9000/
+  Login: admin/admin
+
+========
+Generating SonarQube Server Token on EC2 instance:
+  Browse: http://13.233.244.176:9000/
+  Login: admin/admin
+    -> Go to User > My Account > Security >
+      - Name: Jenkins
+        Generate & Get Token: <SONAR_TOKEN>
+
+=========
+Generate Slack Channel Token:
+> Go to Slack > Channel
+  > Select "Add an app"
+  > Install app "Incoming WebHooks"
+  > This will give an url, from where you will get the slack token.
+  > The url will be in this format:
+    https://hooks.slack.com/services/<SLACK_TOKEN>
+     
+
+=========
+Create SonarQube & Slack Credentials:
+> Manage Jenkins > Manage Credentials > Add Credentials
+  - Kind: Secret text
+    Secret: <SONAR_TOKEN>        [Token from sonarqube]
+    ID: sonarqube-token
+    Description: sonarqube-token
+> Manage Jenkins > Manage Credentials > Add Credentials
+  - Kind: Secret text
+    Secret: <SLACK_TOKEN>        [Token from slack channel - incoming-webhook app]
+    ID: slack-id
+    Description: slack-id
+
+=========
+Configure SonarQube Server:
+> Manage Jenkins > Configure System > SonarQube servers
+  - Name: sonar-6
+    Server URL: http://13.233.244.176:9000/
+    Server authentication token: sonarqube-token
